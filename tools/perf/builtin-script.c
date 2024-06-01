@@ -3898,6 +3898,7 @@ int cmd_script(int argc, const char **argv)
 	struct utsname uts;
 	char *script_path = NULL;
 	const char *dlfilter_file = NULL;
+	const char *addr2line_path = NULL;
 	const char **__argv;
 	int i, j, err = 0;
 	struct perf_script script = {
@@ -4008,6 +4009,8 @@ int cmd_script(int argc, const char **argv)
 		   "only consider symbols in these pids"),
 	OPT_STRING(0, "tid", &symbol_conf.tid_list_str, "tid[,tid...]",
 		   "only consider symbols in these tids"),
+	OPT_STRING(0, "addr2line", &addr2line_path, "path",
+		   "addr2line binary to use for line numbers"),
 	OPT_UINTEGER(0, "max-stack", &scripting_max_stack,
 		     "Set the maximum stack depth when parsing the callchain, "
 		     "anything beyond the specified depth will be ignored. "
@@ -4098,6 +4101,12 @@ int cmd_script(int argc, const char **argv)
 		 * Enable guest sample processing.
 		 */
 		perf_guest = true;
+	}
+
+	if (addr2line_path) {
+		symbol_conf.addr2line_path = strdup(addr2line_path);
+		if (!symbol_conf.addr2line_path)
+			return -ENOMEM;
 	}
 
 	data.path  = input_name;
